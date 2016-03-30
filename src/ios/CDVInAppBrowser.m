@@ -496,10 +496,10 @@
 - (void)createViews
 {
     // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
-
     CGRect webViewBounds = self.view.bounds;
     BOOL toolbarIsAtBottom = ![_browserOptions.toolbarposition isEqualToString:kInAppBrowserToolbarBarPositionTop];
-    webViewBounds.size.height -= _browserOptions.location ? FOOTER_HEIGHT : TOOLBAR_HEIGHT;
+    webViewBounds.size.height -= _browserOptions.location ? TOOLBAR_HEIGHT : TOOLBAR_HEIGHT;
+    webViewBounds.origin.y = 20 + TOOLBAR_HEIGHT;
     self.webView = [[UIWebView alloc] initWithFrame:webViewBounds];
 
     self.webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -533,16 +533,27 @@
     self.spinner.userInteractionEnabled = NO;
     [self.spinner stopAnimating];
 
-    self.closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(close)];
+    self.closeButton = [[UIBarButtonItem alloc] initWithTitle:@"关闭" style:UIBarButtonItemStyleDone target:self action:@selector(close)];
     self.closeButton.enabled = YES;
+    [self.closeButton setTitle:@"关闭"];
+    [self.closeButton setTintColor:[UIColor whiteColor]];
 
     UIBarButtonItem* flexibleSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
 
     UIBarButtonItem* fixedSpaceButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     fixedSpaceButton.width = 20;
 
-    float toolbarY = toolbarIsAtBottom ? self.view.bounds.size.height - TOOLBAR_HEIGHT : 0.0;
+    float toolbarY = 20.0;
     CGRect toolbarFrame = CGRectMake(0.0, toolbarY, self.view.bounds.size.width, TOOLBAR_HEIGHT);
+    
+    UILabel* label = [[UILabel alloc] initWithFrame: CGRectMake(0, 0, 200, TOOLBAR_HEIGHT)];
+    [label setText:@"食客"];
+    [label setTintColor:[UIColor whiteColor]];
+    [label setTextColor:[UIColor whiteColor]];
+    [label setTextAlignment: NSTextAlignmentCenter];
+    [label setBackgroundColor: [UIColor clearColor]];
+    [label setFont: [UIFont systemFontOfSize:18.0]];
+    UIBarButtonItem* title = [[UIBarButtonItem alloc] initWithCustomView:label];
 
     self.toolbar = [[UIToolbar alloc] initWithFrame:toolbarFrame];
     self.toolbar.alpha = 1.000;
@@ -556,60 +567,68 @@
     self.toolbar.multipleTouchEnabled = NO;
     self.toolbar.opaque = NO;
     self.toolbar.userInteractionEnabled = YES;
+    self.toolbar.barTintColor = [UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0];
+//    [self.toolbar setBackgroundColor: [UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0]];
+    [self.toolbar setTintColor: [UIColor whiteColor]];
+//    CGFloat labelInset = 5.0;
+//    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
 
-    CGFloat labelInset = 5.0;
-    float locationBarY = toolbarIsAtBottom ? self.view.bounds.size.height - FOOTER_HEIGHT : self.view.bounds.size.height - LOCATIONBAR_HEIGHT;
+//    self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
+//    self.addressLabel.adjustsFontSizeToFitWidth = NO;
+//    self.addressLabel.alpha = 1.000;
+//    self.addressLabel.autoresizesSubviews = YES;
+//    self.addressLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
+//    self.addressLabel.backgroundColor = [UIColor clearColor];
+//    self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+//    self.addressLabel.clearsContextBeforeDrawing = YES;
+//    self.addressLabel.clipsToBounds = YES;
+//    self.addressLabel.contentMode = UIViewContentModeScaleToFill;
+//    self.addressLabel.enabled = YES;
+//    self.addressLabel.hidden = NO;
+//    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+//
+//    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
+//        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
+//    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
+//        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
+//    }
+//
+//    self.addressLabel.multipleTouchEnabled = NO;
+//    self.addressLabel.numberOfLines = 1;
+//    self.addressLabel.opaque = NO;
+//    self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
+//    self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
+//    self.addressLabel.textAlignment = NSTextAlignmentLeft;
+//    self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
+//    self.addressLabel.userInteractionEnabled = NO;
 
-    self.addressLabel = [[UILabel alloc] initWithFrame:CGRectMake(labelInset, locationBarY, self.view.bounds.size.width - labelInset, LOCATIONBAR_HEIGHT)];
-    self.addressLabel.adjustsFontSizeToFitWidth = NO;
-    self.addressLabel.alpha = 1.000;
-    self.addressLabel.autoresizesSubviews = YES;
-    self.addressLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin;
-    self.addressLabel.backgroundColor = [UIColor clearColor];
-    self.addressLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
-    self.addressLabel.clearsContextBeforeDrawing = YES;
-    self.addressLabel.clipsToBounds = YES;
-    self.addressLabel.contentMode = UIViewContentModeScaleToFill;
-    self.addressLabel.enabled = YES;
-    self.addressLabel.hidden = NO;
-    self.addressLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+//    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
+//    self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
+//    self.forwardButton.enabled = YES;
+//    self.forwardButton.imageInsets = UIEdgeInsetsZero;
+//
+//    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
+//    self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
+//    self.backButton.enabled = YES;
+//    self.backButton.imageInsets = UIEdgeInsetsZero;
+    
 
-    if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumScaleFactor:")]) {
-        [self.addressLabel setValue:@(10.0/[UIFont labelFontSize]) forKey:@"minimumScaleFactor"];
-    } else if ([self.addressLabel respondsToSelector:NSSelectorFromString(@"setMinimumFontSize:")]) {
-        [self.addressLabel setValue:@(10.0) forKey:@"minimumFontSize"];
-    }
-
-    self.addressLabel.multipleTouchEnabled = NO;
-    self.addressLabel.numberOfLines = 1;
-    self.addressLabel.opaque = NO;
-    self.addressLabel.shadowOffset = CGSizeMake(0.0, -1.0);
-    self.addressLabel.text = NSLocalizedString(@"Loading...", nil);
-    self.addressLabel.textAlignment = NSTextAlignmentLeft;
-    self.addressLabel.textColor = [UIColor colorWithWhite:1.000 alpha:1.000];
-    self.addressLabel.userInteractionEnabled = NO;
-
-    NSString* frontArrowString = NSLocalizedString(@"►", nil); // create arrow from Unicode char
-    self.forwardButton = [[UIBarButtonItem alloc] initWithTitle:frontArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goForward:)];
-    self.forwardButton.enabled = YES;
-    self.forwardButton.imageInsets = UIEdgeInsetsZero;
-
-    NSString* backArrowString = NSLocalizedString(@"◄", nil); // create arrow from Unicode char
-    self.backButton = [[UIBarButtonItem alloc] initWithTitle:backArrowString style:UIBarButtonItemStylePlain target:self action:@selector(goBack:)];
-    self.backButton.enabled = YES;
-    self.backButton.imageInsets = UIEdgeInsetsZero;
-
-    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, self.backButton, fixedSpaceButton, self.forwardButton]];
-
-    self.view.backgroundColor = [UIColor grayColor];
+    [self.toolbar setItems:@[self.closeButton, flexibleSpaceButton, title, flexibleSpaceButton, flexibleSpaceButton]];
+//    self.view.backgroundColor = [UIColor redColor];
+    [self.view setBackgroundColor: [UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0]];
+//    self.view.backgroundColor = [UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0];
     [self.view addSubview:self.toolbar];
-    [self.view addSubview:self.addressLabel];
+//    [self.view addSubview:self.addressLabel];
     [self.view addSubview:self.spinner];
 }
 
 - (void) setWebViewFrame : (CGRect) frame {
     NSLog(@"Setting the WebView's frame to %@", NSStringFromCGRect(frame));
     [self.webView setFrame:frame];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle{
+    return UIStatusBarStyleDefault;
 }
 
 - (void)setCloseButtonTitle:(NSString*)title
@@ -748,15 +767,6 @@
     [self.webView loadHTMLString:nil baseURL:nil];
     [CDVUserAgentUtil releaseLock:&_userAgentLockToken];
     [super viewDidUnload];
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleDefault;
-}
-
-- (BOOL)prefersStatusBarHidden {
-    return NO;
 }
 
 - (void)close
@@ -1001,29 +1011,18 @@
 - (void) viewDidLoad {
 
     CGRect frame = [UIApplication sharedApplication].statusBarFrame;
-
     // simplified from: http://stackoverflow.com/a/25669695/219684
 
-    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:[self invertFrameIfNeeded:frame]];
+    UIToolbar* bgToolbar = [[UIToolbar alloc] initWithFrame:frame];
+    [bgToolbar setBarTintColor:[UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0]];
     bgToolbar.barStyle = UIBarStyleDefault;
-    [bgToolbar setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
     [self.view addSubview:bgToolbar];
+    
+//    [self.view setBackgroundColor: [UIColor colorWithRed:180.0/255.0 green:145.0/255.0 blue:76.0/255.0 alpha:1.0]];
 
     [super viewDidLoad];
 }
 
-- (CGRect) invertFrameIfNeeded:(CGRect)rect {
-    // We need to invert since on iOS 7 frames are always in Portrait context
-    if (!IsAtLeastiOSVersion(@"8.0")) {
-        if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
-            CGFloat temp = rect.size.width;
-            rect.size.width = rect.size.height;
-            rect.size.height = temp;
-        }
-        rect.origin = CGPointZero;
-    }
-    return rect;
-}
 
 #pragma mark CDVScreenOrientationDelegate
 
